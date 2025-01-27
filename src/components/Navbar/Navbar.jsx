@@ -1,8 +1,12 @@
-import React from 'react'
-import "./Navbar.css"
+import { Link } from "react-router-dom";
 
-export default function Navbar() {
+function Navbar() {
   return (
-    <div>Navbar</div>
-  )
+    <nav>
+      <Link to="/register">Register</Link>
+      <Link to="/login">Login</Link>
+    </nav>
+  );
 }
+
+export default Navbar;
