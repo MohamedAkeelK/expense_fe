@@ -1,16 +1,18 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+
 import { register } from "../../services/users";
 
 const RegisterScreen = () => {
   const [formData, setFormData] = useState({
     username: "",
     email: "",
-    password_digest: "", // Ensure the password field matches what your backend expects
-    totalMoney: "", // Added totalMoney field
+    password_digest: "",
+    totalMoney: "",
   });
 
   const handleChange = (e) => {
-    const { name, value } = e.target; // Get the name and value from the input
+    const { name, value } = e.target;
     setFormData((prevData) => ({
       ...prevData,
       [name]: value, // Dynamically update the field based on input name
@@ -21,10 +23,11 @@ const RegisterScreen = () => {
     e.preventDefault();
 
     try {
-      // Call the register function and pass the form data
+      // Call the register function
       const user = await register(formData);
       console.log("Registered user:", user);
-      // Redirect or show a success message here
+      // Redirect to login
+      navigate("/login");
     } catch (err) {
       console.log(err);
     }
@@ -40,7 +43,7 @@ const RegisterScreen = () => {
             type="text"
             id="username"
             name="username"
-            value={formData.username} // Corrected value binding
+            value={formData.username}
             onChange={handleChange}
             required
           />

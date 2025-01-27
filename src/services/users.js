@@ -11,3 +11,14 @@ export const register = async (credentials) => {
     throw error;
   }
 };
+
+export const login = async (credentials) => {
+  try {
+    const resp = await api.post("/user/sign-in", credentials);
+    localStorage.setItem("token", resp.data.token); // Save the token to localStorage
+    const user = jwtDecode(resp.data.token); // Decode the token to get user info
+    return user;
+  } catch (error) {
+    throw error;
+  }
+};
