@@ -6,11 +6,6 @@ export default function Home() {
     <div>
       {/* <Navbar /> */}
       <h1>home</h1>
-      <h1>home</h1>
-      <h1>home</h1>
-      <h1>home</h1>
-      <h1>home</h1>
-      <h1>home</h1>
     </div>
   );
 }

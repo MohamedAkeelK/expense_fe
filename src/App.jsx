@@ -2,7 +2,7 @@ import { useState } from "react";
 import Navbar from "./components/Navbar/Navbar";
 import Hero from "./components/Hero/Hero";
 import Login from "./screens/Login/Login";
-import Register from "./screens/Register/Register";
+import RegisterScreen from "./screens/Register/RegisterScreen";
 import { Routes, Route } from "react-router-dom";
 import Home from "./screens/Home/Home";
 
@@ -14,7 +14,7 @@ function App() {
       <Navbar />
       <Routes>
         <Route path="/" element={<Home />} />
-        <Route path="/register" element={<Register />} />
+        <Route path="/register" element={<RegisterScreen />} />
         <Route path="/login" element={<Login />} />
       </Routes>
     </>
