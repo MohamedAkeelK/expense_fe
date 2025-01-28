@@ -4,10 +4,14 @@ import { useNavigate } from "react-router-dom";
 import { register } from "../../services/users";
 
 const RegisterScreen = () => {
+  const navigate = useNavigate(); // Initialize navigate
+
   const [formData, setFormData] = useState({
     username: "",
     email: "",
     password_digest: "",
+    profilePicture: "",
+    dob: "",
     totalMoney: "",
   });
 
@@ -25,7 +29,6 @@ const RegisterScreen = () => {
     try {
       // Call the register function
       const user = await register(formData);
-      console.log("Registered user:", user);
       // Redirect to login
       navigate("/login");
     } catch (err) {
@@ -64,10 +67,33 @@ const RegisterScreen = () => {
         <div>
           <label htmlFor="password_digest">Password</label>
           <input
-            type="password_digest"
+            type="password"
             id="password_digest"
             name="password_digest"
-            value={formData.password}
+            value={formData.password_digest}
+            onChange={handleChange}
+            required
+          />
+        </div>
+
+        <div>
+          <label htmlFor="profilePicture">Profile Picture URL</label>
+          <input
+            type="url"
+            id="profilePicture"
+            name="profilePicture"
+            value={formData.profilePicture}
+            onChange={handleChange}
+          />
+        </div>
+
+        <div>
+          <label htmlFor="dob">Date of Birth</label>
+          <input
+            type="date"
+            id="dob"
+            name="dob"
+            value={formData.dob}
             onChange={handleChange}
             required
           />

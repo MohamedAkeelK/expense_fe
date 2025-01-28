@@ -9,6 +9,7 @@ const LoginScreen = () => {
   });
 
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false); // State for handling loading
   const navigate = useNavigate(); // Initialize navigate
 
   const handleChange = (e) => {
@@ -21,16 +22,24 @@ const LoginScreen = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true); // Set loading to true when form is submitted
 
     try {
-      const user = await login(formData);
+      const user = await login(formData); // Call login function
       console.log("Logged in user:", user);
+
+      // Store token in localStorage (if returned by the backend)
+      if (user.token) {
+        localStorage.setItem("token", user.token); // Store the token
+      }
 
       // Redirect to the dashboard on successful login
       navigate("/dashboard");
     } catch (err) {
       console.error("Login error:", err);
       setError("Invalid email or password. Please try again.");
+    } finally {
+      setLoading(false); // Reset loading state once request is complete
     }
   };
 
