@@ -27,6 +27,7 @@ const Dashboard = () => {
           console.log("Fetching user profile...");
           const userProfile = await getUserProfile(verifiedUser.id);
           setProfile(userProfile); // Set the profile data
+          console.log(userProfile);
         }
       } catch (err) {
         console.error("Error fetching dashboard data:", err.message);
@@ -54,50 +55,98 @@ const Dashboard = () => {
   }
 
   return (
-    <div>
-      <h1>Welcome, {profile.username}!</h1>
-      <p>Email: {profile.email}</p>
-      <p>Date of Birth: {profile.dob}</p>
-      <p>Total Money: ${profile.totalMoney}</p>
+    <div className="min-h-screen bg-gray-100 p-6">
+      <div className="max-w-4xl mx-auto bg-white p-8 rounded-xl shadow-lg">
+        <h1 className="text-3xl font-bold text-center text-blue-600">
+          Welcome, {profile.username}!
+        </h1>
 
-      <h2>Expenses</h2>
-      {profile.expenses.length > 0 ? (
-        <ul>
-          {profile.expenses.map((expense) => (
-            <li key={expense._id}>
-              {expense.description} - ${expense.amount} on{" "}
-              {new Date(expense.date).toLocaleDateString()}
-            </li>
-          ))}
-        </ul>
-      ) : (
-        <p>No expenses recorded.</p>
-      )}
+        <div className="mt-6">
+          <div className="space-y-4">
+            <p className="text-lg">
+              <span className="font-semibold">Email:</span> {profile.email}
+            </p>
+            <p className="text-lg">
+              <span className="font-semibold">Date of Birth:</span>{" "}
+              {profile.dob}
+            </p>
+            <p className="text-lg">
+              <span className="font-semibold">Total Money:</span> $
+              {profile.totalMoney}
+            </p>
+          </div>
 
-      <h2>Incomes</h2>
-      {profile.incomes.length > 0 ? (
-        <ul>
-          {profile.incomes.map((income) => (
-            <li key={income._id}>
-              {income.description} - ${income.amount} on{" "}
-              {new Date(income.date).toLocaleDateString()}
-            </li>
-          ))}
-        </ul>
-      ) : (
-        <p>No incomes recorded.</p>
-      )}
+          <div className="mt-8">
+            <h2 className="text-2xl font-semibold text-gray-800">Expenses</h2>
+            {profile.expenses.length > 0 ? (
+              <ul className="mt-4 space-y-3">
+                {profile.expenses.map((expense) => (
+                  <li
+                    key={expense._id}
+                    className="bg-gray-50 p-4 rounded-lg shadow-sm"
+                  >
+                    <div className="flex justify-between">
+                      <span className="font-semibold">
+                        {expense.description}
+                      </span>
+                      <span className="text-red-600">${expense.amount}</span>
+                    </div>
+                    <p className="text-sm text-gray-600">
+                      {new Date(expense.date).toLocaleDateString()}
+                    </p>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p className="mt-2 text-gray-500">No expenses recorded.</p>
+            )}
+          </div>
 
-      <h2>Goals</h2>
-      {profile.goals.length > 0 ? (
-        <ul>
-          {profile.goals.map((goal) => (
-            <li key={goal._id}>{goal.title}</li>
-          ))}
-        </ul>
-      ) : (
-        <p>No goals set.</p>
-      )}
+          <div className="mt-8">
+            <h2 className="text-2xl font-semibold text-gray-800">Incomes</h2>
+            {profile.incomes.length > 0 ? (
+              <ul className="mt-4 space-y-3">
+                {profile.incomes.map((income) => (
+                  <li
+                    key={income._id}
+                    className="bg-gray-50 p-4 rounded-lg shadow-sm"
+                  >
+                    <div className="flex justify-between">
+                      <span className="font-semibold">
+                        {income.description}
+                      </span>
+                      <span className="text-green-600">${income.amount}</span>
+                    </div>
+                    <p className="text-sm text-gray-600">
+                      {new Date(income.date).toLocaleDateString()}
+                    </p>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p className="mt-2 text-gray-500">No incomes recorded.</p>
+            )}
+          </div>
+
+          <div className="mt-8">
+            <h2 className="text-2xl font-semibold text-gray-800">Goals</h2>
+            {profile.goals.length > 0 ? (
+              <ul className="mt-4 space-y-3">
+                {profile.goals.map((goal) => (
+                  <li
+                    key={goal._id}
+                    className="bg-gray-50 p-4 rounded-lg shadow-sm"
+                  >
+                    <span className="text-lg font-semibold">{goal.title}</span>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p className="mt-2 text-gray-500">No goals set.</p>
+            )}
+          </div>
+        </div>
+      </div>
     </div>
   );
 };
