@@ -1,46 +1,45 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { verify, getUserProfile } from "../../services/users";
+import { Pie, Bar } from "react-chartjs-2";
+import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend, ArcElement } from "chart.js";
+
+// Register the chart components
+ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend, ArcElement);
 
 const Dashboard = () => {
   const [user, setUser] = useState(null);
   const [profile, setProfile] = useState(null);
   const [error, setError] = useState("");
-  const [loading, setLoading] = useState(true); // Track loading state
+  const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
   useEffect(() => {
     const fetchUserData = async () => {
       try {
-        // Verify the user
         const verifiedUser = await verify();
         if (!verifiedUser) {
-          // If verification fails, redirect to login
           navigate("/login");
           return;
         }
 
-        setUser(verifiedUser); // Set the verified user data
+        setUser(verifiedUser);
 
-        // Fetch the user's profile only if it's not already loaded
         if (!profile) {
-          console.log("Fetching user profile...");
           const userProfile = await getUserProfile(verifiedUser.id);
-          setProfile(userProfile); // Set the profile data
-          console.log(userProfile);
+          setProfile(userProfile);
         }
       } catch (err) {
-        console.error("Error fetching dashboard data:", err.message);
         setError("Failed to load dashboard. Please try again later.");
       } finally {
-        setLoading(false); // Set loading to false when the request is complete
+        setLoading(false);
       }
     };
 
     if (loading) {
-      fetchUserData(); // Only fetch data if it's loading
+      fetchUserData();
     }
-  }, []);
+  }, [loading, profile, navigate]);
 
   if (error) {
     return <p>{error}</p>;
@@ -50,36 +49,120 @@ const Dashboard = () => {
     return <p>Loading...</p>;
   }
 
-  if (profile) {
-    console.log(profile);
-  }
+  // Process expenses and incomes for charts
+  const expenseCategories = profile.expenses.reduce((acc, expense) => {
+    const category = expense.categoryTags.join(", ");
+    acc[category] = (acc[category] || 0) + expense.amount;
+    return acc;
+  }, {});
+
+  const expenseCategoryLabels = Object.keys(expenseCategories);
+  const expenseCategoryData = Object.values(expenseCategories);
+
+  // Expenses over time (monthly)
+  const monthlyExpenses = profile.expenses.reduce((acc, expense) => {
+    const month = new Date(expense.date).toLocaleString("default", { month: "short" });
+    acc[month] = (acc[month] || 0) + expense.amount;
+    return acc;
+  }, {});
+
+  const expenseMonths = Object.keys(monthlyExpenses);
+  const expenseAmounts = Object.values(monthlyExpenses);
 
   return (
-    <div className="min-h-screen bg-gray-100 p-6">
-      <div className="max-w-4xl mx-auto bg-white p-8 rounded-xl shadow-lg">
-        <h1 className="text-3xl font-bold text-center text-blue-600">
+    <div className="min-h-screen bg-gray-100 p-8">
+      <div className="max-w-7xl mx-auto bg-white p-8 rounded-xl shadow-lg">
+        <h1 className="text-3xl font-bold text-center text-blue-600 mb-8">
           Welcome, {profile.username}!
         </h1>
 
-        <div className="mt-6">
-          <div className="space-y-4">
-            <p className="text-lg">
-              <span className="font-semibold">Email:</span> {profile.email}
-            </p>
-            <p className="text-lg">
-              <span className="font-semibold">Date of Birth:</span>{" "}
-              {profile.dob}
-            </p>
-            <p className="text-lg">
-              <span className="font-semibold">Total Money:</span> $
-              {profile.totalMoney}
-            </p>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {/* User Info Widget */}
+          <div className="bg-white p-6 rounded-lg shadow-md">
+            <h2 className="text-xl font-semibold text-gray-700 mb-4">User Info</h2>
+            <div className="text-gray-600">
+              <p className="text-lg"><span className="font-semibold">Email:</span> {profile.email}</p>
+              <p className="text-lg"><span className="font-semibold">DOB:</span> {profile.dob}</p>
+              <p className="text-lg"><span className="font-semibold">Total Money:</span> ${profile.totalMoney}</p>
+            </div>
           </div>
 
-          <div className="mt-8">
-            <h2 className="text-2xl font-semibold text-gray-800">Expenses</h2>
+          {/* Expense Categories Pie Chart Widget */}
+          <div className="bg-white p-6 rounded-lg shadow-md col-span-1 lg:col-span-2">
+            <h2 className="text-xl font-semibold text-gray-700 mb-4">Expense Categories</h2>
+            <Pie
+              data={{
+                labels: expenseCategoryLabels,
+                datasets: [
+                  {
+                    label: "Expense Categories",
+                    data: expenseCategoryData,
+                    backgroundColor: [
+                      "#FF6347", // Tomato
+                      "#FFD700", // Gold
+                      "#32CD32", // LimeGreen
+                      "#1E90FF", // DodgerBlue
+                      "#8A2BE2", // BlueViolet
+                      "#FF1493", // DeepPink
+                    ],
+                  },
+                ],
+              }}
+              options={{
+                responsive: true,
+                plugins: {
+                  legend: {
+                    position: "top",
+                  },
+                },
+              }}
+            />
+          </div>
+
+          {/* Expenses Over Time Bar Chart Widget */}
+          <div className="bg-white p-6 rounded-lg shadow-md col-span-1 lg:col-span-2">
+            <h2 className="text-xl font-semibold text-gray-700 mb-4">Expenses Over Time</h2>
+            <Bar
+              data={{
+                labels: expenseMonths,
+                datasets: [
+                  {
+                    label: "Monthly Expenses",
+                    data: expenseAmounts,
+                    backgroundColor: "#FF6347",
+                    borderColor: "#FF4500",
+                    borderWidth: 1,
+                  },
+                ],
+              }}
+              options={{
+                responsive: true,
+                plugins: {
+                  title: {
+                    display: true,
+                    text: "Expenses Over Time",
+                  },
+                  legend: {
+                    position: "top",
+                  },
+                },
+                scales: {
+                  x: {
+                    beginAtZero: true,
+                  },
+                  y: {
+                    beginAtZero: true,
+                  },
+                },
+              }}
+            />
+          </div>
+
+          {/* Recent Expenses Widget */}
+          <div className="bg-white p-6 rounded-lg shadow-md">
+            <h2 className="text-xl font-semibold text-gray-700 mb-4">Recent Expenses</h2>
             {profile.expenses.length > 0 ? (
-              <ul className="mt-4 space-y-3">
+              <ul className="space-y-3">
                 {profile.expenses.map((expense) => (
                   <li
                     key={expense._id}
@@ -102,10 +185,11 @@ const Dashboard = () => {
             )}
           </div>
 
-          <div className="mt-8">
-            <h2 className="text-2xl font-semibold text-gray-800">Incomes</h2>
+          {/* Recent Incomes Widget */}
+          <div className="bg-white p-6 rounded-lg shadow-md">
+            <h2 className="text-xl font-semibold text-gray-700 mb-4">Recent Incomes</h2>
             {profile.incomes.length > 0 ? (
-              <ul className="mt-4 space-y-3">
+              <ul className="space-y-3">
                 {profile.incomes.map((income) => (
                   <li
                     key={income._id}
@@ -128,10 +212,11 @@ const Dashboard = () => {
             )}
           </div>
 
-          <div className="mt-8">
-            <h2 className="text-2xl font-semibold text-gray-800">Goals</h2>
+          {/* Goals Widget */}
+          <div className="bg-white p-6 rounded-lg shadow-md">
+            <h2 className="text-xl font-semibold text-gray-700 mb-4">Goals</h2>
             {profile.goals.length > 0 ? (
-              <ul className="mt-4 space-y-3">
+              <ul className="space-y-3">
                 {profile.goals.map((goal) => (
                   <li
                     key={goal._id}
@@ -146,8 +231,8 @@ const Dashboard = () => {
             )}
           </div>
         </div>
-      </div>
-    </div>
+      </div> {/* Close the wrapper div */}
+    </div> 
   );
 };
 
