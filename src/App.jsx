@@ -9,17 +9,19 @@ import AddExpenses from "./screens/Expenses/AddExpenses"; // Page to add new exp
 
 function App() {
   return (
-    <>
+    <div className="flex">
       <Navbar />
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/register" element={<RegisterScreen />} />
-        <Route path="/login" element={<LoginScreen />} />
-        <Route path="/dashboard" element={<Dashboard />} />
-        <Route path="/expenses" element={<Expenses />} />
-        <Route path="/expenses/add" element={<AddExpenses />} />
-      </Routes>
-    </>
+      <div className="flex-1 ml-64 p-8">
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/register" element={<RegisterScreen />} />
+          <Route path="/login" element={<LoginScreen />} />
+          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/expenses" element={<Expenses />} />
+          <Route path="/expenses/add" element={<AddExpenses />} />
+        </Routes>
+      </div>
+    </div>
   );
 }
 

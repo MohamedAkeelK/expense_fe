@@ -9,7 +9,7 @@ export default function AddExpenses() {
     categoryTags: [],
     paymentMethod: "",
     isRecurring: false,
-    recurringPeriod: "", // Ensure it's empty initially
+    recurringPeriod: null, // Ensure it's empty initially
     status: "pending", // Default status is "pending"
     notes: "",
   });
@@ -35,10 +35,21 @@ export default function AddExpenses() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Validation
+    // Ensure recurringPeriod has a value when recurring is selected
+    if (formData.isRecurring && !formData.recurringPeriod) {
+      setError("Please select a recurring period.");
+      return;
+    }
+
+    // Validation: Make sure required fields are filled
     if (!formData.description || !formData.amount || !formData.paymentMethod) {
       setError("Please fill in all required fields.");
       return;
+    }
+
+    // Set default recurringPeriod value to null if not recurring
+    if (!formData.isRecurring) {
+      formData.recurringPeriod = null; // Fix: Set to null instead of ""
     }
 
     try {

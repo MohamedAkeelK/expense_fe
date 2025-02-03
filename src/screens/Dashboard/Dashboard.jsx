@@ -2,10 +2,27 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { verify, getUserProfile } from "../../services/users";
 import { Pie, Bar } from "react-chartjs-2";
-import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend, ArcElement } from "chart.js";
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  Title,
+  Tooltip,
+  Legend,
+  ArcElement,
+} from "chart.js";
 
 // Register the chart components
-ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend, ArcElement);
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  Title,
+  Tooltip,
+  Legend,
+  ArcElement
+);
 
 const Dashboard = () => {
   const [user, setUser] = useState(null);
@@ -61,7 +78,9 @@ const Dashboard = () => {
 
   // Expenses over time (monthly)
   const monthlyExpenses = profile.expenses.reduce((acc, expense) => {
-    const month = new Date(expense.date).toLocaleString("default", { month: "short" });
+    const month = new Date(expense.date).toLocaleString("default", {
+      month: "short",
+    });
     acc[month] = (acc[month] || 0) + expense.amount;
     return acc;
   }, {});
@@ -70,26 +89,19 @@ const Dashboard = () => {
   const expenseAmounts = Object.values(monthlyExpenses);
 
   return (
-    <div className="min-h-screen bg-gray-100 p-8">
+    <div className="min-h-screen bg-gray-100">
       <div className="max-w-7xl mx-auto bg-white p-8 rounded-xl shadow-lg">
         <h1 className="text-3xl font-bold text-center text-blue-600 mb-8">
           Welcome, {profile.username}!
         </h1>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {/* User Info Widget */}
+        {/* Top Section: Charts */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {/* Expense Categories Pie Chart */}
           <div className="bg-white p-6 rounded-lg shadow-md">
-            <h2 className="text-xl font-semibold text-gray-700 mb-4">User Info</h2>
-            <div className="text-gray-600">
-              <p className="text-lg"><span className="font-semibold">Email:</span> {profile.email}</p>
-              <p className="text-lg"><span className="font-semibold">DOB:</span> {profile.dob}</p>
-              <p className="text-lg"><span className="font-semibold">Total Money:</span> ${profile.totalMoney}</p>
-            </div>
-          </div>
-
-          {/* Expense Categories Pie Chart Widget */}
-          <div className="bg-white p-6 rounded-lg shadow-md col-span-1 lg:col-span-2">
-            <h2 className="text-xl font-semibold text-gray-700 mb-4">Expense Categories</h2>
+            <h2 className="text-xl font-semibold text-gray-700 mb-4">
+              Expense Categories
+            </h2>
             <Pie
               data={{
                 labels: expenseCategoryLabels,
@@ -119,9 +131,11 @@ const Dashboard = () => {
             />
           </div>
 
-          {/* Expenses Over Time Bar Chart Widget */}
-          <div className="bg-white p-6 rounded-lg shadow-md col-span-1 lg:col-span-2">
-            <h2 className="text-xl font-semibold text-gray-700 mb-4">Expenses Over Time</h2>
+          {/* Expenses Over Time Bar Chart */}
+          <div className="bg-white p-6 rounded-lg shadow-md">
+            <h2 className="text-xl font-semibold text-gray-700 mb-4">
+              Expenses Over Time
+            </h2>
             <Bar
               data={{
                 labels: expenseMonths,
@@ -157,10 +171,15 @@ const Dashboard = () => {
               }}
             />
           </div>
+        </div>
 
-          {/* Recent Expenses Widget */}
+        {/* Bottom Section: Recent Expenses, Incomes, and Goals */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
+          {/* Recent Expenses */}
           <div className="bg-white p-6 rounded-lg shadow-md">
-            <h2 className="text-xl font-semibold text-gray-700 mb-4">Recent Expenses</h2>
+            <h2 className="text-xl font-semibold text-gray-700 mb-4">
+              Recent Expenses
+            </h2>
             {profile.expenses.length > 0 ? (
               <ul className="space-y-3">
                 {profile.expenses.map((expense) => (
@@ -185,9 +204,11 @@ const Dashboard = () => {
             )}
           </div>
 
-          {/* Recent Incomes Widget */}
+          {/* Recent Incomes */}
           <div className="bg-white p-6 rounded-lg shadow-md">
-            <h2 className="text-xl font-semibold text-gray-700 mb-4">Recent Incomes</h2>
+            <h2 className="text-xl font-semibold text-gray-700 mb-4">
+              Recent Incomes
+            </h2>
             {profile.incomes.length > 0 ? (
               <ul className="space-y-3">
                 {profile.incomes.map((income) => (
@@ -212,7 +233,7 @@ const Dashboard = () => {
             )}
           </div>
 
-          {/* Goals Widget */}
+          {/* Goals */}
           <div className="bg-white p-6 rounded-lg shadow-md">
             <h2 className="text-xl font-semibold text-gray-700 mb-4">Goals</h2>
             {profile.goals.length > 0 ? (
@@ -231,8 +252,8 @@ const Dashboard = () => {
             )}
           </div>
         </div>
-      </div> {/* Close the wrapper div */}
-    </div> 
+      </div>
+    </div>
   );
 };
 
