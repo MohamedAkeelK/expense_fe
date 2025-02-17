@@ -5,10 +5,9 @@ import LoginScreen from "../Login/LoginScreen";
 
 export default function Home() {
   return (
-    <div>
-      <RegisterScreen />
+    <div className="flex p-6">
+      <RegisterScreen className="" />
       <LoginScreen />
-      <Hero />
     </div>
   );
 }

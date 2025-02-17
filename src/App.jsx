@@ -14,7 +14,7 @@ function App() {
   return (
     <div className="flex">
       {showNavbar && <Navbar />} {/* Conditional rendering for Navbar */}
-      <div className="min-w-0 flex-1 p-4">
+      <div className="min-w-0 flex-1">
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/dashboard" element={<Dashboard />} />
