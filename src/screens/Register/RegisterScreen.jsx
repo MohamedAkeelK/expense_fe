@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import { register } from "../../services/users";
-
+  
 const RegisterScreen = () => {
   const navigate = useNavigate(); // Initialize navigate
 
@@ -37,8 +37,8 @@ const RegisterScreen = () => {
   };
 
   return (
-    <div className="flex w-full max-w max-h-screen items-center justify-center bg-gray-100 border-0 p-6">
-      <div className="w-full max-w-md bg-white p-6 rounded-2xl shadow-lg">
+    <div className="flex w-full max-w max-h-screen items-center justify-center bg-gray-100 p-6 border-r-2 border-black">
+      <div className="w-full max-w-md p-6 rounded-2xl shadow-lg">
         <h1 className="text-red-500 text-2xl font-bold text-center">
           Register
         </h1>

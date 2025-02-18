@@ -5,7 +5,7 @@ import LoginScreen from "../Login/LoginScreen";
 
 export default function Home() {
   return (
-    <div className="flex p-6">
+    <div className="flex">
       <RegisterScreen className="" />
       <LoginScreen />
     </div>
