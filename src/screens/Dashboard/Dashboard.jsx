@@ -99,22 +99,20 @@ const Dashboard = () => {
       {/* Row 1 */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4 flex-1">
         {/* User Widget */}
-        <div className="bg-white rounded-lg shadow p-6 flex items-center">
+        <div className="bg-amber-100 rounded-lg shadow p-6 flex flex-col items-center">
           <img
             alt="Profile"
             src={profile.profielPicture}
             className="w-20 h-20 rounded-full object-cover"
           />
           <div className="pl-4">
-            <h2 className="text-xl font-semibold text-gray-800">
-              {profile.username}
-            </h2>
+            <h2 className="font-semibold text-gray-800">{profile.username}</h2>
             <p className="text-xs text-gray-500">username</p>
           </div>
         </div>
 
         {/* Total Balance */}
-        <div className="bg-white rounded-lg shadow p-6 flex flex-col items-center justify-center">
+        <div className="bg-green-50 rounded-lg shadow p-6 flex flex-col items-center justify-center">
           <p className="text-lg font-semibold text-gray-800 mb-2">
             Total Balance:
           </p>
@@ -124,7 +122,7 @@ const Dashboard = () => {
         </div>
 
         {/* Latest Expense */}
-        <div className="bg-white rounded-lg shadow p-6 flex flex-col items-center justify-center">
+        <div className="bg-red-50 rounded-lg shadow p-6 flex flex-col items-center justify-center">
           <h3 className="text-lg font-semibold text-gray-800 mb-2">
             Latest Expense
           </h3>
