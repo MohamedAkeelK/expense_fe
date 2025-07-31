@@ -61,27 +61,20 @@ const Dashboard = () => {
     }
   }, [loading, profile, navigate]);
 
-  if (error) {
-    return <p>{error}</p>;
-  }
-
-  if (loading || !profile) {
-    return <p>Loading...</p>;
-  }
+  if (error) return <p>{error}</p>;
+  if (loading || !profile) return <p>Loading...</p>;
 
   // Process expenses for charts
   const expenseCategories = profile.expenses.reduce((acc, expense) => {
-    // Check if category exists and is a valid string/array
     let category =
       Array.isArray(expense.categoryTags) && expense.categoryTags.length > 0
-        ? expense.categoryTags[0] // Use first category if it's an array
-        : expense.category || "Other"; // Use category field if it's a string
+        ? expense.categoryTags[0]
+        : expense.category || "Other";
 
     acc[category] = (acc[category] || 0) + expense.amount;
     return acc;
   }, {});
 
-  // Extract data for Pie Chart
   const expenseCategoryLabels = Object.keys(expenseCategories);
   const expenseCategoryData = Object.values(expenseCategories);
 
@@ -102,156 +95,225 @@ const Dashboard = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 pl-64">
-      {" "}
-      {/* Fix navbar overlap */}
-      <div className="max-w-7xl mx-auto bg-white p-8 rounded-xl shadow-lg">
-        <h1 className="text-3xl font-bold text-center text-blue-600 mb-8">
-          Welcome, {profile.username}!
-        </h1>
-
-        {/* Charts Section */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {/* Pie Chart: Expense Categories */}
-          <div className="bg-white p-6 rounded-lg shadow-md">
-            <h2 className="text-xl font-semibold text-gray-700 mb-4">
-              Expense Categories
+    <div className="min-h-screen bg-gray-100 px-4 py-2 flex flex-col space-y-2">
+      {/* Row 1 */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 flex-1">
+        {/* User Widget */}
+        <div className="bg-white rounded-lg shadow p-6 flex items-center">
+          <img
+            alt="Profile"
+            src={profile.profielPicture}
+            className="w-20 h-20 rounded-full object-cover"
+          />
+          <div className="pl-4">
+            <h2 className="text-xl font-semibold text-gray-800">
+              {profile.username}
             </h2>
-            <Pie
-              data={{
-                labels: expenseCategoryLabels,
-                datasets: [
-                  {
-                    label: "Expense Categories",
-                    data: expenseCategoryData,
-                    backgroundColor: [
-                      "#FF6347",
-                      "#FFD700",
-                      "#32CD32",
-                      "#1E90FF",
-                      "#8A2BE2",
-                      "#FF1493",
-                    ],
-                  },
-                ],
-              }}
-            />
-          </div>
-
-          {/* Bar Chart: Monthly Expenses */}
-          <div className="bg-white p-6 rounded-lg shadow-md">
-            <h2 className="text-xl font-semibold text-gray-700 mb-4">
-              Expenses Over Time
-            </h2>
-            <Bar
-              data={{
-                labels: expenseMonths,
-                datasets: [
-                  {
-                    label: "Monthly Expenses",
-                    data: expenseAmounts,
-                    backgroundColor: "#FF6347",
-                    borderColor: "#FF4500",
-                    borderWidth: 1,
-                  },
-                ],
-              }}
-            />
+            <p className="text-xs text-gray-500">username</p>
           </div>
         </div>
 
-        {/* Recent Expenses, Incomes, and Goals Section */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
-          {["expenses", "incomes", "goals"].map((type) => {
-            const currentPage =
-              type === "expenses"
-                ? currentPageExpenses
-                : type === "incomes"
-                ? currentPageIncomes
-                : currentPageGoals;
-            const setCurrentPage =
-              type === "expenses"
-                ? setCurrentPageExpenses
-                : type === "incomes"
-                ? setCurrentPageIncomes
-                : setCurrentPageGoals;
+        {/* Total Balance */}
+        <div className="bg-white rounded-lg shadow p-6 flex flex-col items-center justify-center">
+          <p className="text-lg font-semibold text-gray-800 mb-2">
+            Total Balance:
+          </p>
+          <p className="text-2xl font-bold text-green-600">
+            ${profile.totalMoney || 0}
+          </p>
+        </div>
 
-            return (
-              <div key={type} className="bg-white p-6 rounded-lg shadow-md">
-                <h2 className="text-xl font-semibold text-gray-700 mb-4">
-                  Recent {type.charAt(0).toUpperCase() + type.slice(1)}
-                </h2>
-                {profile[type].length > 0 ? (
-                  <ul className="space-y-3">
-                    {paginate(profile[type], currentPage).map((item) => (
-                      <li
-                        key={item._id}
-                        className="bg-gray-50 p-4 rounded-lg shadow-sm"
-                      >
-                        <div className="flex justify-between">
-                          <span className="font-semibold">
-                            {item.description || item.title}
-                          </span>
+        {/* Latest Expense */}
+        <div className="bg-white rounded-lg shadow p-6 flex flex-col items-center justify-center">
+          <h3 className="text-lg font-semibold text-gray-800 mb-2">
+            Latest Expense
+          </h3>
+          {profile.expenses?.length > 0 ? (
+            <>
+              <p className="text-xl text-red-600 font-bold">
+                ${profile.expenses[0].amount}
+              </p>
+              <p className="text-sm text-gray-600">
+                {new Date(profile.expenses[0].date).toLocaleDateString()}
+              </p>
+            </>
+          ) : (
+            <p className="text-gray-400">No expense recorded</p>
+          )}
+        </div>
+
+        {/* Latest Income */}
+        <div className="bg-white rounded-lg shadow p-6 flex flex-col items-center justify-center">
+          <h3 className="text-lg font-semibold text-gray-800 mb-2">
+            Latest Income
+          </h3>
+          {profile.incomes?.length > 0 ? (
+            <>
+              <p className="text-xl text-green-600 font-bold">
+                ${profile.incomes[0].amount}
+              </p>
+              <p className="text-sm text-gray-600">
+                Source: {profile.incomes[0].source}
+              </p>
+            </>
+          ) : (
+            <p className="text-gray-400">No income recorded</p>
+          )}
+        </div>
+      </div>
+
+      {/* Row 2 */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 flex-1">
+        {/* Pie Chart */}
+        <div className="bg-white rounded-lg shadow p-6 flex flex-col">
+          <h2 className="text-xl font-semibold mb-4 text-center">
+            Expense Categories
+          </h2>
+          <div className="flex-1">
+            <div className="w-full h-70">
+              <Pie
+                data={{
+                  labels: expenseCategoryLabels,
+                  datasets: [
+                    {
+                      data: expenseCategoryData,
+                      backgroundColor: [
+                        "#FF6347",
+                        "#FFD700",
+                        "#32CD32",
+                        "#1E90FF",
+                        "#8A2BE2",
+                        "#FF1493",
+                      ],
+                    },
+                  ],
+                }}
+                options={{
+                  responsive: true,
+                  maintainAspectRatio: false,
+                  plugins: {
+                    legend: {
+                      position: "right",
+                    },
+                    title: {
+                      display: false,
+                      text: "Expense Categories",
+                    },
+                  },
+                  layout: {
+                    padding: 0,
+                  },
+                }}
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* Bar Chart */}
+        <div className="bg-white rounded-lg shadow p-6 flex flex-col h-full">
+          <h2 className="text-xl font-semibold mb-4 text-center">
+            Monthly Expenses
+          </h2>
+          <div className="flex-1">
+            <div className="w-full h-70">
+              <Bar
+                data={{
+                  labels: expenseMonths,
+                  datasets: [
+                    {
+                      label: "Monthly Expenses",
+                      data: expenseAmounts,
+                      backgroundColor: "#FF6347",
+                      borderColor: "#FF4500",
+                      borderWidth: 1,
+                    },
+                  ],
+                }}
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Row 3 */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 flex-1 overflow-y-auto">
+        {["expenses", "incomes", "goals"].map((type) => {
+          const currentPage =
+            type === "expenses"
+              ? currentPageExpenses
+              : type === "incomes"
+              ? currentPageIncomes
+              : currentPageGoals;
+
+          const setCurrentPage =
+            type === "expenses"
+              ? setCurrentPageExpenses
+              : type === "incomes"
+              ? setCurrentPageIncomes
+              : setCurrentPageGoals;
+
+          return (
+            <div
+              key={type}
+              className="bg-white rounded-lg shadow p-6 flex flex-col"
+            >
+              <h3 className="text-lg font-semibold text-gray-800 mb-2">
+                Recent {type.charAt(0).toUpperCase() + type.slice(1)}
+              </h3>
+              {profile[type].length > 0 ? (
+                <ul className="space-y-2 flex-1 overflow-auto">
+                  {paginate(profile[type], currentPage).map((item) => (
+                    <li key={item._id} className="border-b pb-2">
+                      <div className="flex justify-between">
+                        <span>{item.description || item.title}</span>
+                        {type !== "goals" && (
                           <span
                             className={
                               type === "expenses"
-                                ? "text-red-600"
-                                : "text-green-600"
+                                ? "text-red-500"
+                                : "text-green-500"
                             }
                           >
-                            {type !== "goals" ? `$${item.amount}` : ""}
+                            ${item.amount}
                           </span>
-                        </div>
-                        <p className="text-sm text-gray-600">
-                          {item.date
-                            ? new Date(item.date).toLocaleDateString()
-                            : ""}
-                        </p>
-                        {/* New Details */}
-                        {type !== "goals" && (
-                          <p className="text-sm text-gray-500">
-                            Category:{" "}
-                            {item.categoryTags || item.source || "N/A"}
-                          </p>
                         )}
-                        {type === "goals" && (
-                          <p className="text-sm text-gray-500">
-                            Status: {item.status || "Ongoing"}
-                          </p>
-                        )}
-                      </li>
-                    ))}
-                  </ul>
-                ) : (
-                  <p className="mt-2 text-gray-500">No {type} recorded.</p>
-                )}
+                      </div>
+                      <p className="text-xs text-gray-500">
+                        {item.date && new Date(item.date).toLocaleDateString()}
+                      </p>
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p className="text-gray-400">No {type} recorded.</p>
+              )}
 
-                {profile[type].length > itemsPerPage && (
-                  <div className="flex justify-between mt-4">
-                    <button
-                      onClick={() =>
-                        setCurrentPage((prev) => Math.max(prev - 1, 1))
-                      }
-                      disabled={currentPage === 1}
-                      className="px-3 py-1 bg-blue-500 text-white rounded-md disabled:opacity-50"
-                    >
-                      Prev
-                    </button>
-                    <button
-                      onClick={() => setCurrentPage((prev) => prev + 1)}
-                      disabled={
-                        currentPage * itemsPerPage >= profile[type].length
-                      }
-                      className="px-3 py-1 bg-blue-500 text-white rounded-md disabled:opacity-50"
-                    >
-                      Next
-                    </button>
-                  </div>
-                )}
-              </div>
-            );
-          })}
-        </div>
+              {/* Pagination */}
+              {profile[type].length > itemsPerPage && (
+                <div className="flex justify-between mt-4">
+                  <button
+                    onClick={() =>
+                      setCurrentPage((prev) => Math.max(prev - 1, 1))
+                    }
+                    disabled={currentPage === 1}
+                    className="text-sm px-3 py-1 bg-blue-500 text-white rounded disabled:opacity-50"
+                  >
+                    Prev
+                  </button>
+                  <button
+                    onClick={() => setCurrentPage((prev) => prev + 1)}
+                    disabled={
+                      currentPage * itemsPerPage >= profile[type].length
+                    }
+                    className="text-sm px-3 py-1 bg-blue-500 text-white rounded disabled:opacity-50"
+                  >
+                    Next
+                  </button>
+                </div>
+              )}
+            </div>
+          );
+        })}
       </div>
     </div>
   );

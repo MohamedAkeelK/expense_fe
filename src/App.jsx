@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Routes, Route } from "react-router-dom";
 import Navbar from "./components/Navbar/Navbar";
 import LoginScreen from "./components/Login/LoginScreen";
@@ -8,12 +9,16 @@ import Expenses from "./screens/Expenses/Expenses";
 import AddExpenses from "./screens/Expenses/AddExpenses";
 
 function App() {
+  const [collapsed, setCollapsed] = useState(false);
+
   return (
-    <div>
-      <Navbar />
-      <div className="ml-64 p-4">
-        {" "}
-        {/* Push content to the right of the fixed sidebar */}
+    <div className="flex">
+      <Navbar collapsed={collapsed} setCollapsed={setCollapsed} />
+      <div
+        className={`transition-all duration-300 p-4 w-full ${
+          collapsed ? "ml-16" : "ml-64"
+        }`}
+      >
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/dashboard" element={<Dashboard />} />

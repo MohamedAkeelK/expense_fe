@@ -15,8 +15,7 @@ import {
   FaPiggyBank,
 } from "react-icons/fa";
 
-function Navbar() {
-  const [collapsed, setCollapsed] = useState(false);
+function Navbar({ collapsed, setCollapsed }) {
   const [openMenus, setOpenMenus] = useState({
     expenses: false,
     incomes: false,
@@ -26,6 +25,7 @@ function Navbar() {
   const toggleSidebar = () => setCollapsed(!collapsed);
 
   const toggleMenu = (menu) => {
+    if (collapsed) return;
     setOpenMenus((prev) => ({ ...prev, [menu]: !prev[menu] }));
   };
 
@@ -62,79 +62,106 @@ function Navbar() {
         </Link>
 
         {/* Expenses */}
-        <div>
-          <button
-            onClick={() => toggleMenu("expenses")}
-            className="flex items-center justify-between w-full py-2 px-3 hover:bg-gray-700 rounded-lg"
+        {collapsed ? (
+          <Link
+            to="/expenses"
+            className="flex items-center gap-4 py-2 px-3 hover:bg-gray-700 rounded-lg"
           >
-            <div className="flex items-center gap-4">
-              <FaMoneyBill className="iconClass text-red-900" />
-              {!collapsed && <span>Expenses</span>}
-            </div>
-            {!collapsed &&
-              (openMenus.expenses ? <FaChevronUp /> : <FaChevronDown />)}
-          </button>
-          {openMenus.expenses && !collapsed && (
-            <div className="ml-8 mt-2 flex flex-col gap-2">
-              <Link to="/expenses" className="hover:text-gray-400 text-xs">
-                - View Expenses
-              </Link>
-              <Link to="/expenses/add" className="hover:text-gray-400 text-xs">
-                - Add Expense
-              </Link>
-            </div>
-          )}
-        </div>
+            <FaMoneyBill className="text-red-900" />
+          </Link>
+        ) : (
+          <>
+            <button
+              onClick={() => toggleMenu("expenses")}
+              className="flex items-center justify-between w-full py-2 px-3 hover:bg-gray-700 rounded-lg"
+            >
+              <div className="flex items-center gap-4">
+                <FaMoneyBill className="text-red-900" />
+                <span>Expenses</span>
+              </div>
+              {openMenus.expenses ? <FaChevronUp /> : <FaChevronDown />}
+            </button>
+            {openMenus.expenses && (
+              <div className="ml-8 mt-2 flex flex-col gap-2">
+                <Link to="/expenses" className="hover:text-gray-400 text-xs">
+                  - View Expenses
+                </Link>
+                <Link
+                  to="/expenses/add"
+                  className="hover:text-gray-400 text-xs"
+                >
+                  - Add Expense
+                </Link>
+              </div>
+            )}
+          </>
+        )}
 
         {/* Incomes */}
-        <div>
-          <button
-            onClick={() => toggleMenu("incomes")}
-            className="flex items-center justify-between w-full py-2 px-3 hover:bg-gray-700 rounded-lg"
+        {collapsed ? (
+          <Link
+            to="/incomes"
+            className="flex items-center gap-4 py-2 px-3 hover:bg-gray-700 rounded-lg"
           >
-            <div className="flex items-center gap-4">
-              <FaPlus className="iconClass text-green-500" />
-              {!collapsed && <span>Incomes</span>}
-            </div>
-            {!collapsed &&
-              (openMenus.incomes ? <FaChevronUp /> : <FaChevronDown />)}
-          </button>
-          {openMenus.incomes && !collapsed && (
-            <div className="ml-8 mt-2 flex flex-col gap-2">
-              <Link to="/incomes" className="hover:text-gray-400 text-xs">
-                - View Incomes
-              </Link>
-              <Link to="/incomes/add" className="hover:text-gray-400 text-xs">
-                - Add Income
-              </Link>
-            </div>
-          )}
-        </div>
+            <FaPlus className="text-green-500" />
+          </Link>
+        ) : (
+          <>
+            <button
+              onClick={() => toggleMenu("incomes")}
+              className="flex items-center justify-between w-full py-2 px-3 hover:bg-gray-700 rounded-lg"
+            >
+              <div className="flex items-center gap-4">
+                <FaPlus className="text-green-500" />
+                <span>Incomes</span>
+              </div>
+              {openMenus.incomes ? <FaChevronUp /> : <FaChevronDown />}
+            </button>
+            {openMenus.incomes && (
+              <div className="ml-8 mt-2 flex flex-col gap-2">
+                <Link to="/incomes" className="hover:text-gray-400 text-xs">
+                  - View Incomes
+                </Link>
+                <Link to="/incomes/add" className="hover:text-gray-400 text-xs">
+                  - Add Income
+                </Link>
+              </div>
+            )}
+          </>
+        )}
 
         {/* Goals */}
-        <div>
-          <button
-            onClick={() => toggleMenu("goals")}
-            className="flex items-center justify-between w-full py-2 px-3 hover:bg-gray-700 rounded-lg"
+        {collapsed ? (
+          <Link
+            to="/goals"
+            className="flex items-center gap-4 py-2 px-3 hover:bg-gray-700 rounded-lg"
           >
-            <div className="flex items-center gap-4">
-              <FaBullseye className="iconClass text-blue-600" />
-              {!collapsed && <span>Goals</span>}
-            </div>
-            {!collapsed &&
-              (openMenus.goals ? <FaChevronUp /> : <FaChevronDown />)}
-          </button>
-          {openMenus.goals && !collapsed && (
-            <div className="ml-8 mt-2 flex flex-col gap-2">
-              <Link to="/goals" className="hover:text-gray-400 text-xs">
-                - View Goals
-              </Link>
-              <Link to="/goals/add" className="hover:text-gray-400 text-xs">
-                - Add Goal
-              </Link>
-            </div>
-          )}
-        </div>
+            <FaBullseye className="text-blue-600" />
+          </Link>
+        ) : (
+          <>
+            <button
+              onClick={() => toggleMenu("goals")}
+              className="flex items-center justify-between w-full py-2 px-3 hover:bg-gray-700 rounded-lg"
+            >
+              <div className="flex items-center gap-4">
+                <FaBullseye className="text-blue-600" />
+                <span>Goals</span>
+              </div>
+              {openMenus.goals ? <FaChevronUp /> : <FaChevronDown />}
+            </button>
+            {openMenus.goals && (
+              <div className="ml-8 mt-2 flex flex-col gap-2">
+                <Link to="/goals" className="hover:text-gray-400 text-xs">
+                  - View Goals
+                </Link>
+                <Link to="/goals/add" className="hover:text-gray-400 text-xs">
+                  - Add Goal
+                </Link>
+              </div>
+            )}
+          </>
+        )}
 
         {/* Reports */}
         <Link
