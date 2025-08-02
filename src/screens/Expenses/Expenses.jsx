@@ -1,161 +1,230 @@
 import React, { useEffect, useState } from "react";
-import { getUserProfile } from "../../services/users";
 import { useNavigate } from "react-router-dom";
+import { getUserProfile, verify } from "../../services/users";
 
-export default function Expenses() {
-  const [expenses, setExpenses] = useState([]);
+const ViewExpenses = () => {
+  const [user, setUser] = useState(null);
+  const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 8; // Change this for different page sizes
+  const [itemsPerPage] = useState(9);
+  const [sortField, setSortField] = useState("date");
+  const [sortOrder, setSortOrder] = useState("desc");
+  const [filterStatus, setFilterStatus] = useState("");
+  const [filterCategory, setFilterCategory] = useState("");
   const navigate = useNavigate();
 
   useEffect(() => {
-    const fetchExpenses = async () => {
+    const fetchData = async () => {
       try {
-        const profile = await getUserProfile();
-        if (!profile) {
-          navigate("/login"); // If no profile found, redirect to login
+        const verified = await verify();
+        if (!verified) {
+          navigate("/login");
           return;
         }
-        setExpenses(profile.expenses); // Assuming `expenses` field exists in user profile
+        setUser(verified);
+
+        const userProfile = await getUserProfile(verified.id);
+        setProfile(userProfile);
       } catch (err) {
-        setError("Failed to fetch expenses. Please try again later.");
-        console.error("Error fetching expenses:", err);
+        console.error("Failed to fetch user or profile", err);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchExpenses();
+    fetchData();
   }, [navigate]);
 
-  if (loading) return <div className="text-center p-6">Loading...</div>;
-  if (error) return <div className="text-center p-6 text-red-500">{error}</div>;
+  const sortData = (data) => {
+    return [...data].sort((a, b) => {
+      const aVal = a[sortField];
+      const bVal = b[sortField];
 
-  // Calculate pagination data
-  const indexOfLastItem = currentPage * itemsPerPage;
-  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentExpenses = expenses.slice(indexOfFirstItem, indexOfLastItem);
-  const totalPages = Math.ceil(expenses.length / itemsPerPage);
+      if (sortOrder === "asc") {
+        return aVal > bVal ? 1 : -1;
+      } else {
+        return aVal < bVal ? 1 : -1;
+      }
+    });
+  };
+
+  const filterData = (data) => {
+    return data.filter((item) => {
+      const matchesStatus = filterStatus ? item.status === filterStatus : true;
+      const matchesCategory = filterCategory
+        ? item.categoryTags?.includes(filterCategory)
+        : true;
+      return matchesStatus && matchesCategory;
+    });
+  };
+
+  const paginate = (data, currentPage) => {
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    return data.slice(startIndex, startIndex + itemsPerPage);
+  };
+
+  const handleSort = (field) => {
+    if (sortField === field) {
+      setSortOrder(sortOrder === "asc" ? "desc" : "asc");
+    } else {
+      setSortField(field);
+      setSortOrder("asc");
+    }
+  };
+
+  if (loading) return <p className="text-center">Loading...</p>;
+  if (!profile) return <p className="text-center">No profile found.</p>;
+
+  const expenses = sortData(filterData(profile.expenses || []));
+  const currentExpenses = paginate(expenses, currentPage);
 
   return (
-    <div className="min-h-screen bg-gray-100 p-6">
-      <div className="max-w-7xl mx-auto bg-white p-8 rounded-xl shadow-lg">
-        <h1 className="text-3xl font-bold text-center text-blue-600 mb-6">
-          Your Expenses
-        </h1>
+    <div className="min-h-screen bg-gray-50 p-6">
+      <div className="max-w-7xl mx-auto space-y-6">
+        <div className="flex justify-between items-center">
+          <h1 className="text-2xl font-bold text-gray-800">Expenses</h1>
+          <button
+            onClick={() => navigate("/expenses/add")}
+            className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+          >
+            + Add Expense
+          </button>
+        </div>
 
-        <table className="min-w-full bg-white border border-gray-200 rounded-lg shadow-md">
-          <thead>
-            <tr className="text-left border-b bg-gray-50">
-              <th className="px-4 py-3 text-gray-700 font-semibold">
-                Description
-              </th>
-              <th className="px-4 py-3 text-gray-700 font-semibold">Amount</th>
-              <th className="px-4 py-3 text-gray-700 font-semibold">
-                Category
-              </th>
-              <th className="px-4 py-3 text-gray-700 font-semibold">
-                Payment Method
-              </th>
-              <th className="px-4 py-3 text-gray-700 font-semibold">
-                Recurring
-              </th>
-              <th className="px-4 py-3 text-gray-700 font-semibold">Status</th>
-              <th className="px-4 py-3 text-gray-700 font-semibold">Date</th>
-            </tr>
-          </thead>
-          <tbody>
-            {currentExpenses.length > 0 ? (
-              currentExpenses.map((expense) => (
-                <tr key={expense._id} className="hover:bg-gray-50">
-                  <td className="px-4 py-3 text-gray-800">
-                    {expense.description || "No description"}
-                  </td>
-                  <td className="px-4 py-3 text-red-600">${expense.amount}</td>
-                  <td className="px-4 py-3 text-gray-600">
-                    {expense.categoryTags
-                      ? expense.categoryTags.join(", ")
-                      : "Uncategorized"}
-                  </td>
-                  <td className="px-4 py-3 text-gray-600">
-                    {expense.paymentMethod
-                      ? expense.paymentMethod.charAt(0).toUpperCase() +
-                        expense.paymentMethod.slice(1)
-                      : "N/A"}
-                  </td>
-                  <td className="px-4 py-3 text-gray-600">
-                    {expense.isRecurring ? (
-                      <span className="text-green-600">
-                        Yes ({expense.recurringPeriod})
-                      </span>
-                    ) : (
-                      <span className="text-red-600">No</span>
-                    )}
-                  </td>
-                  <td className="px-4 py-3 text-gray-600">
-                    <span
-                      className={`${
-                        expense.status === "paid"
-                          ? "bg-green-100 text-green-600"
-                          : expense.status === "pending"
-                          ? "bg-yellow-100 text-yellow-600"
-                          : "bg-red-100 text-red-600"
-                      } py-1 px-2 rounded-full text-sm font-semibold`}
-                    >
-                      {expense.status.charAt(0).toUpperCase() +
-                        expense.status.slice(1)}
-                    </span>
-                  </td>
-                  <td className="px-4 py-3 text-gray-600">
+        {/* Filters */}
+        <div className="flex flex-wrap gap-4">
+          <select
+            value={filterStatus}
+            onChange={(e) => setFilterStatus(e.target.value)}
+            className="border px-3 py-2 rounded"
+          >
+            <option value="">All Status</option>
+            <option value="pending">Pending</option>
+            <option value="paid">Paid</option>
+            <option value="overdue">Overdue</option>
+          </select>
+
+          <select
+            value={filterCategory}
+            onChange={(e) => setFilterCategory(e.target.value)}
+            className="border px-3 py-2 rounded"
+          >
+            <option value="">All Categories</option>
+            <option value="Food">Food</option>
+            <option value="Transportation">Transportation</option>
+            <option value="Bills">Bills</option>
+            <option value="Rent">Rent</option>
+            <option value="Entertainment">Entertainment</option>
+            <option value="Groceries">Groceries</option>
+            <option value="Other">Other</option>
+          </select>
+        </div>
+
+        {/* Table */}
+        {/* Expense Table (Desktop) */}
+        <div className="hidden md:block overflow-x-auto">
+          <table className="min-w-full bg-white shadow-lg rounded-lg overflow-hidden">
+            <thead className="bg-blue-50 text-blue-800 text-sm font-semibold uppercase">
+              <tr>
+                <th className="py-3 px-6 text-left">Date</th>
+                <th className="py-3 px-6 text-left">Description</th>
+                <th className="py-3 px-6 text-left">Category</th>
+                <th className="py-3 px-6 text-left">Payment</th>
+                <th className="py-3 px-6 text-left">Recurring</th>
+                <th className="py-3 px-6 text-left">Status</th>
+                <th className="py-3 px-6 text-left">Notes</th>
+                <th className="py-3 px-6 text-right">Amount</th>
+              </tr>
+            </thead>
+            <tbody className="text-sm text-gray-700 divide-y divide-gray-100">
+              {paginate(expenses, currentPage).map((expense, idx) => (
+                <tr
+                  key={expense._id}
+                  className={`hover:bg-blue-50 transition-colors ${
+                    idx % 2 === 0 ? "bg-white" : "bg-gray-50"
+                  }`}
+                >
+                  <td className="py-3 px-6">
                     {new Date(expense.date).toLocaleDateString()}
                   </td>
+                  <td className="py-3 px-6">{expense.description}</td>
+                  <td className="py-3 px-6">
+                    {expense.categoryTags?.[0] || expense.category || "N/A"}
+                  </td>
+                  <td className="py-3 px-6 capitalize">
+                    {expense.paymentMethod}
+                  </td>
+                  <td className="py-3 px-6">
+                    {expense.isRecurring ? expense.recurringPeriod : "No"}
+                  </td>
+                  <td
+                    className={`py-3 px-6 capitalize font-medium ${
+                      expense.status === "paid"
+                        ? "text-green-600"
+                        : expense.status === "pending"
+                        ? "text-yellow-600"
+                        : "text-red-600"
+                    }`}
+                  >
+                    {expense.status}
+                  </td>
+                  <td className="py-3 px-6 text-gray-500 italic">
+                    {expense.notes || "-"}
+                  </td>
+                  <td className="py-3 px-6 text-right text-red-500 font-semibold">
+                    ${expense.amount.toFixed(2)}
+                  </td>
                 </tr>
-              ))
-            ) : (
-              <tr>
-                <td colSpan="7" className="px-4 py-3 text-center text-gray-500">
-                  No expenses found.
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
+              ))}
+            </tbody>
+          </table>
+        </div>
 
-        {/* Pagination Controls */}
-        {totalPages > 1 && (
-          <div className="flex justify-center items-center space-x-4 mt-6">
-            <button
-              onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-              disabled={currentPage === 1}
-              className={`px-4 py-2 rounded-lg ${
-                currentPage === 1
-                  ? "bg-gray-300 cursor-not-allowed"
-                  : "bg-blue-500 text-white hover:bg-blue-600"
-              }`}
-            >
-              Previous
-            </button>
-            <span className="text-gray-700 font-semibold">
-              Page {currentPage} of {totalPages}
-            </span>
-            <button
-              onClick={() =>
-                setCurrentPage((prev) => Math.min(prev + 1, totalPages))
-              }
-              disabled={currentPage === totalPages}
-              className={`px-4 py-2 rounded-lg ${
-                currentPage === totalPages
-                  ? "bg-gray-300 cursor-not-allowed"
-                  : "bg-blue-500 text-white hover:bg-blue-600"
-              }`}
-            >
-              Next
-            </button>
-          </div>
-        )}
+        {/* Mobile Cards */}
+        <div className="md:hidden space-y-4">
+          {currentExpenses.map((expense) => (
+            <div key={expense._id} className="bg-white shadow rounded-lg p-4">
+              <div className="flex justify-between text-sm text-gray-600">
+                <span>{new Date(expense.date).toLocaleDateString()}</span>
+                <span className="text-red-500 font-bold">
+                  ${expense.amount}
+                </span>
+              </div>
+              <p className="text-lg text-gray-800">{expense.description}</p>
+              <p className="text-sm text-gray-500">
+                {expense.categoryTags?.join(", ")}
+              </p>
+              <p className="text-sm text-gray-500">{expense.paymentMethod}</p>
+              <p className="text-sm text-gray-500">
+                Recurring: {expense.isRecurring ? "Yes" : "No"}
+              </p>
+              <p className="text-sm text-gray-500">Status: {expense.status}</p>
+              <p className="text-sm text-gray-500">{expense.notes}</p>
+            </div>
+          ))}
+        </div>
+
+        {/* Pagination */}
+        <div className="flex justify-center mt-6 space-x-2">
+          <button
+            onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+            disabled={currentPage === 1}
+            className="px-3 py-1 bg-blue-500 text-white rounded disabled:opacity-50"
+          >
+            Prev
+          </button>
+          <button
+            onClick={() => setCurrentPage((prev) => prev + 1)}
+            disabled={currentPage * itemsPerPage >= expenses.length}
+            className="px-3 py-1 bg-blue-500 text-white rounded disabled:opacity-50"
+          >
+            Next
+          </button>
+        </div>
       </div>
     </div>
   );
-}
+};
+
+export default ViewExpenses;
