@@ -36,6 +36,7 @@ function App() {
           <Route path="/login" element={<LoginScreen />} />
           <Route path="/register" element={<RegisterScreen />} />
           <Route path="/reports" element={<Reports />} />
+          <Route path="*" element={<div>Page not found</div>} />
         </Routes>
       </div>
     </div>
