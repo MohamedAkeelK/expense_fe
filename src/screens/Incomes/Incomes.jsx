@@ -92,9 +92,10 @@ export default function ViewIncomes() {
   return (
     <div className="min-h-screen bg-gray-50 p-6">
       <div className="max-w-7xl mx-auto space-y-6">
-        <div className="flex justify-between items-center">
+        {/* Header */}
+        <div className="flex flex-col md:flex-row md:justify-between md:items-center space-y-4 md:space-y-0">
           <h1 className="text-2xl font-bold text-gray-800">Incomes</h1>
-          <div className="space-x-2">
+          <div className="flex flex-col md:flex-row gap-2">
             <button
               onClick={handleDownloadCSV}
               className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
@@ -136,8 +137,8 @@ export default function ViewIncomes() {
           </select>
         </div>
 
-        {/* Table */}
-        <div className="overflow-x-auto">
+        {/* Desktop Table */}
+        <div className="hidden md:block overflow-x-auto">
           <table className="min-w-full bg-white shadow rounded-lg">
             <thead className="bg-green-50 text-green-800 text-sm font-semibold uppercase">
               <tr>
@@ -189,6 +190,30 @@ export default function ViewIncomes() {
               ))}
             </tbody>
           </table>
+        </div>
+
+        {/* Mobile Cards */}
+        <div className="md:hidden space-y-4">
+          {currentIncomes.map((income) => (
+            <div key={income._id} className="bg-white shadow rounded-lg p-4">
+              <div className="flex justify-between text-sm text-gray-600">
+                <span>{new Date(income.date).toLocaleDateString()}</span>
+                <span className="text-green-600 font-bold">
+                  ${income.amount}
+                </span>
+              </div>
+              <p className="text-lg text-gray-800">{income.source}</p>
+              <p className="text-sm text-gray-500">{income.description}</p>
+              <p className="text-sm text-gray-500">{income.paymentMethod}</p>
+              <p className="text-sm text-gray-500">
+                Recurring: {income.isRecurring ? "Yes" : "No"}
+              </p>
+              <p className="text-sm text-gray-500">Status: {income.status}</p>
+              <p className="text-sm text-gray-500">
+                {income.notes || "No notes"}
+              </p>
+            </div>
+          ))}
         </div>
 
         {/* Pagination */}

@@ -9,8 +9,8 @@ const LoginScreen = () => {
   });
 
   const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false); // State for handling loading
-  const navigate = useNavigate(); // Initialize navigate
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -22,67 +22,72 @@ const LoginScreen = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true); // Set loading to true when form is submitted
+    setLoading(true);
 
     try {
-      const user = await login(formData); // Call login function
-      console.log("Logged in user:", user);
-
-      // Store token in localStorage (if returned by the backend)
+      const user = await login(formData);
       if (user.token) {
-        localStorage.setItem("token", user.token); // Store the token
+        localStorage.setItem("token", user.token);
       }
-
-      // Redirect to the dashboard on successful login
       navigate("/dashboard");
     } catch (err) {
       console.error("Login error:", err);
       setError("Invalid email or password. Please try again.");
     } finally {
-      setLoading(false); // Reset loading state once request is complete
+      setLoading(false);
     }
   };
 
   return (
-    <div className="flex w-full max-w max-h-screen  items-center justify-center bg-gray-100 border-0 p-6">
-      <div className="w-full max-w bg-white p-6 ro unded-2xl shadow-lg">
-        <h1 className="text-red-500 text-2xl font-bold text-center">Login</h1>
+    <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-blue-100 to-blue-200 p-4">
+      <div className="w-full max-w-md bg-white p-8 rounded-2xl shadow-xl">
+        <h1 className="text-3xl font-bold text-center text-blue-600">
+          Welcome Back
+        </h1>
+        <p className="text-center text-gray-500 text-sm mt-1">
+          Login to your account
+        </p>
 
         {error && (
-          <p className="mt-2 text-red-500 text-sm text-center">{error}</p>
+          <p className="mt-4 text-red-500 text-center text-sm">{error}</p>
         )}
 
-        <form onSubmit={handleSubmit} className="mt-4">
-          <div className="mb-4">
-            <label htmlFor="email" className="block text-gray-700 font-medium">
+        <form onSubmit={handleSubmit} className="mt-6 space-y-5">
+          <div>
+            <label
+              htmlFor="login_email"
+              className="block text-sm font-medium text-gray-700"
+            >
               Email
             </label>
             <input
               type="email"
-              id="email"
+              id="login_email"
               name="email"
               value={formData.email}
               onChange={handleChange}
               required
-              className="w-full mt-1 p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full mt-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              placeholder="Enter your email"
             />
           </div>
 
-          <div className="mb-4">
+          <div>
             <label
-              htmlFor="password_digest"
-              className="block text-gray-700 font-medium"
+              htmlFor="login_password"
+              className="block text-sm font-medium text-gray-700"
             >
               Password
             </label>
             <input
               type="password"
-              id="password_digest"
+              id="login_password"
               name="password_digest"
               value={formData.password_digest}
               onChange={handleChange}
               required
-              className="w-full mt-1 p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full mt-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              placeholder="Enter your password"
             />
           </div>
 
@@ -95,9 +100,12 @@ const LoginScreen = () => {
           </button>
         </form>
 
-        <p className="mt-4 text-sm text-center text-gray-600">
+        <p className="mt-6 text-sm text-center text-gray-600">
           Don't have an account?{" "}
-          <a href="/register" className="text-blue-500 hover:underline">
+          <a
+            href="/register"
+            className="text-blue-500 hover:underline font-medium"
+          >
             Register
           </a>
         </p>

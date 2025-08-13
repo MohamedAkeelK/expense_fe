@@ -118,7 +118,7 @@ export default function Reports() {
 
   return (
     <div className="min-h-screen p-6 bg-gray-50">
-      <div className="flex justify-between items-center mb-6">
+      <div className="flex flex-col md:flex-row md:justify-between md:items-center space-y-4 md:space-y-0 mb-6">
         <h1 className="text-3xl font-bold">Reports & Insights</h1>
         <button
           onClick={exportPDF}

@@ -7,8 +7,7 @@ export const getToken = () => {
 };
 
 const api = axios.create({
-  // baseURL: "https://devnoteapp-production.up.railway.app/api",
-  baseURL: "http://localhost:8800/api",
+  baseURL: import.meta.env.VITE_API_URL || "http://localhost:8800/api",
 });
 
 api.interceptors.request.use(

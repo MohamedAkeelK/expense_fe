@@ -80,9 +80,9 @@ const ViewExpenses = () => {
   const currentExpenses = paginate(expenses, currentPage);
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
+    <div className="min-h-screen bg-gray-50 p-6 ">
       <div className="max-w-7xl mx-auto space-y-6">
-        <div className="flex justify-between items-center">
+        <div className="flex flex-col md:flex-row md:justify-between md:items-center space-y-4 md:space-y-0">
           <h1 className="text-2xl font-bold text-gray-800">Expenses</h1>
           <button
             onClick={() => navigate("/expenses/add")}

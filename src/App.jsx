@@ -20,12 +20,12 @@ function App() {
     <div className="flex">
       <Navbar collapsed={collapsed} setCollapsed={setCollapsed} />
       <div
-        className={`transition-all duration-300 p-4 w-full ${
+        className={`transition-all duration-300 w-full ${
           collapsed ? "ml-16" : "ml-64"
         }`}
       >
         <Routes>
-          <Route path="/" element={<Home />} />
+          <Route path="/" element={<RegisterScreen />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/expenses" element={<Expenses />} />
           <Route path="/expenses/add" element={<AddExpenses />} />
