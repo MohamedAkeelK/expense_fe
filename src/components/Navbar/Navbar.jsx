@@ -15,6 +15,13 @@ import {
   FaPiggyBank,
 } from "react-icons/fa";
 
+// Auto-collapse on mobile view when component mounts
+useEffect(() => {
+  if (window.innerWidth < 768) {
+    setCollapsed(true);
+  }
+}, [setCollapsed]);
+
 function Navbar({ collapsed, setCollapsed }) {
   const [openMenus, setOpenMenus] = useState({
     expenses: false,
