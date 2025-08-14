@@ -15,19 +15,27 @@ import {
   FaPiggyBank,
 } from "react-icons/fa";
 
-// Auto-collapse on mobile view when component mounts
-useEffect(() => {
-  if (window.innerWidth < 768) {
-    setCollapsed(true);
-  }
-}, [setCollapsed]);
-
 function Navbar({ collapsed, setCollapsed }) {
   const [openMenus, setOpenMenus] = useState({
     expenses: false,
     incomes: false,
     goals: false,
   });
+
+  // Automatically collapse on small screens
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth < 768) {
+        setCollapsed(true);
+      } else {
+        setCollapsed(false);
+      }
+    };
+
+    handleResize(); // Run on mount
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, [setCollapsed]);
 
   const toggleSidebar = () => setCollapsed(!collapsed);
 
@@ -47,12 +55,9 @@ function Navbar({ collapsed, setCollapsed }) {
       {/* Logo */}
       <div className="flex items-center justify-center h-16 px-2 gap-2">
         <FaPiggyBank className="text-amber-300 text-2xl" />
-
         <Link
           to="/dashboard"
-          className={`2x1 font-bold transition-opacity duration-300 ${
-            collapsed ? "opacity-100" : "opacity-100"
-          }`}
+          className="text-xl font-bold transition-opacity duration-300"
         >
           {collapsed ? "CC" : "CashCrash"}
         </Link>
@@ -64,7 +69,7 @@ function Navbar({ collapsed, setCollapsed }) {
           to="/dashboard"
           className="flex items-center gap-4 py-2 px-3 hover:bg-gray-700 rounded-lg"
         >
-          <FaHome className="iconClass text-amber-700" />
+          <FaHome className="text-amber-700" />
           {!collapsed && <span>Dashboard</span>}
         </Link>
 
@@ -175,7 +180,7 @@ function Navbar({ collapsed, setCollapsed }) {
           to="/reports"
           className="flex items-center gap-4 py-2 px-3 hover:bg-gray-700 rounded-lg"
         >
-          <FaChartBar className="iconClass text-teal-700" />
+          <FaChartBar className="text-teal-700" />
           {!collapsed && <span>Reports</span>}
         </Link>
       </nav>
@@ -202,7 +207,7 @@ function Navbar({ collapsed, setCollapsed }) {
       <div className="absolute -right-3 bottom-4 z-50">
         <button
           onClick={toggleSidebar}
-          className="bg-white bg-opacity-10 text-black border-7 border-amber-300 rounded-full p-2 hover:bg-opacity-20 hover:bg-black hover:text-white transition-all duration-1000"
+          className="bg-white bg-opacity-10 text-black border-2 border-amber-300 rounded-full p-2 hover:bg-opacity-20 hover:bg-black hover:text-white transition-all duration-300"
         >
           {collapsed ? <FaChevronRight /> : <FaChevronLeft />}
         </button>
